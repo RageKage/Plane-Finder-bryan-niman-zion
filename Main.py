@@ -23,6 +23,7 @@ def create_menu():
     menu.add_option('2', 'Search for a plane', plane_search)
     menu.add_option('3', 'Bookmark a plane', bookmark_plane)
     menu.add_option('4', 'Quit program', exit)
+    menu.add_option('5', 'create test data', create_sample_planes)
 
     return menu
 
@@ -43,6 +44,15 @@ def show_bookmarked_planes():
     for plane in planes:
         print(plane)
     print()
+
+
+# Developer test function just to create data to manipulate in the database. Should be removed once we can search for
+# actual plane data.
+def create_sample_planes():
+    boeing = Plane(name='Boeing 737', description='a plane created by Boeing.')
+    boeing.save()
+    airbus = Plane(name='Airbus A-321neo', description='a plane created by Airbus.')
+    airbus.save()
 
 
 # Runs the program
