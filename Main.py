@@ -21,7 +21,7 @@ def create_menu():
     menu = Menu()
     menu.add_option('1', 'Show all bookmarked planes', show_bookmarked_planes)
     menu.add_option('2', 'Search for a plane', plane_search)
-    menu.add_option('3', 'Bookmark a plane', bookmark_plane)
+    # menu.add_option('3', 'Bookmark a plane', bookmark_plane) possible option, TBD whether this is worth it.
     menu.add_option('4', 'Quit program', exit)
     menu.add_option('5', 'create test data', create_sample_planes)
 
