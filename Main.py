@@ -20,14 +20,25 @@ def Main():
 # this function creates the menu to be seen by the user.
 def create_menu():
     menu = Menu()
-    menu.add_option('1', 'Show all bookmarked planes', show_bookmarked_planes)
-    menu.add_option('2', 'Search for a plane in DB', plane_search)
-    menu.add_option('3', 'Search for a plane in API', search_plane)
-    # menu.add_option('3', 'Bookmark a plane', bookmark_plane) possible option, TBD whether this is worth it.
-    menu.add_option('4', 'Quit program', exit)
-    menu.add_option('5', 'create test data', create_sample_planes)
+    menu.add_option('1', 'DB Plane Search', plane_search)
+    menu.add_option('2', 'API Plane Search', search_plane)
+    menu.add_option('3', 'Display Bookmarked Planes', get_show_bookmarked_planes)
+    
+    # menu.add_option('4', 'Bookmark a Plane', bookmark_plane) possible option, TBD whether this is worth it.
+    
+    menu.add_option('4', 'Delete Plane in DB', delete_plane)
+    menu.add_option('5', 'Generate Test Data', create_sample_planes)
+    menu.add_option('6', 'Exit Program', exit)
 
     return menu
+
+def delete_plane():
+    planes = db_manager.show_bookmarked_planes()
+    for plane in planes:
+        print(plane)
+    delete = input('Enter plane model to delete:')
+    db_manager.delete_plane_by_model_or_dbID(delete)
+    pass
 
 def search_plane():
     search = input('Enter plane model to search:')
@@ -36,8 +47,10 @@ def search_plane():
 
 def plane_search():
     search = input('Enter the plane you want to search for (Model or icao): ')
-    planes = UserPlane.select().where(UserPlane.model.contains(search) | UserPlane.icao.contains(search))
-    for plane in planes:
+    plane = db_manager.search_plane(search)
+    if plane is None:
+        print('Plane not found.')
+    else:
         print(plane)
 
 def bookmark_plane():
@@ -45,8 +58,8 @@ def bookmark_plane():
 
 
 # Shows all bookmarked planes
-def show_bookmarked_planes():
-    planes = Plane.select()
+def get_show_bookmarked_planes():
+    planes = db_manager.show_bookmarked_planes()
     for plane in planes:
         print(plane)
 
