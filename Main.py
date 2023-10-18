@@ -33,6 +33,7 @@ def create_menu():
 
     return menu
 
+
 def delete_bookmarked_plane(): # This is to delete a plane from the user db
     planes = db_manager.show_bookmarked_planes()
     for plane in planes:
@@ -41,11 +42,14 @@ def delete_bookmarked_plane(): # This is to delete a plane from the user db
     db_manager.delete_plane_by_model_or_dbID(delete)
     pass
 
+
+"""This function is called when a user wants to find out more information about a specific plane model. So far the user
+   can get a url to an image of the plane they searched for by calling the Flickr API. TBA calls that will also get the
+   current number of that model flying, and a description of the plane. These will be displayed together."""
 def search_aircraft_in_api(): # This is to search for the plane in the api
     search = input('Enter plane model to search:')
     image_url = planeImage.get_image_link(search)
     print(image_url)
-    pass
 
 
 def search_bookmarked_plane(): # this searches in the user db
@@ -55,6 +59,7 @@ def search_bookmarked_plane(): # this searches in the user db
         print('Plane not found.')
     else:
         print(plane)
+
 
 def add_plane_to_bookmarks(): # This is to add a plane to the user db
     pass
