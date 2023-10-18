@@ -34,7 +34,7 @@ def create_menu():
     return menu
 
 
-def create_bookmark_menu():
+def create_bookmark_menu():  # Adds 2 options to a menu after each time the user searches for a plane.
     menu = Menu()
     menu.add_option('1', 'Bookmark this plane', add_plane_to_bookmarks)
     menu.add_option('2', 'Go back to main menu', go_back)
@@ -42,7 +42,7 @@ def create_bookmark_menu():
     return menu
 
 
-def delete_bookmarked_plane(): # This is to delete a plane from the user db
+def delete_bookmarked_plane():  # This is to delete a plane from the user db
     planes = db_manager.show_bookmarked_planes()
     for plane in planes:
         print(plane)
@@ -59,8 +59,10 @@ def search_aircraft_in_api():
     image_url = planeImage.get_image_link(search)
     print(image_url)
 
+    # Creates a menu with the option to bookmark a plane.
     bookmark_menu = create_bookmark_menu()
 
+    # Loop pulled from Main(). Creates a mini menu
     while True:
         print(bookmark_menu)
         choice = input('Enter action here: ')
@@ -91,7 +93,8 @@ def display_bookmarked_planes(): # This displays all the planes in the user db
         print(plane)
 
 
-def go_back():
+def go_back():  # Very short function since the menu object requires a function parameter. This is just to give the user
+                # a response before pulling up the main menu.
     print('\nOk, sending you back...\n')
 
 
