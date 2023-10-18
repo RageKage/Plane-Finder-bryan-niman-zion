@@ -1,6 +1,7 @@
 import databaseManager
 from databaseManager import *
 from menu import Menu
+import planeImage
 
 def Main():
         
@@ -42,6 +43,8 @@ def delete_bookmarked_plane(): # This is to delete a plane from the user db
 
 def search_aircraft_in_api(): # This is to search for the plane in the api
     search = input('Enter plane model to search:')
+    image_url = planeImage.get_image_link(search)
+    print(image_url)
     pass
 
 
