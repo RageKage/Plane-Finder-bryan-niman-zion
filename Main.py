@@ -34,6 +34,14 @@ def create_menu():
     return menu
 
 
+def create_bookmark_menu():
+    menu = Menu()
+    menu.add_option('1', 'Bookmark this plane', add_plane_to_bookmarks)
+    menu.add_option('2', 'Go back to main menu', go_back)
+
+    return menu
+
+
 def delete_bookmarked_plane(): # This is to delete a plane from the user db
     planes = db_manager.show_bookmarked_planes()
     for plane in planes:
@@ -46,10 +54,21 @@ def delete_bookmarked_plane(): # This is to delete a plane from the user db
 """This function is called when a user wants to find out more information about a specific plane model. So far the user
    can get a url to an image of the plane they searched for by calling the Flickr API. TBA calls that will also get the
    current number of that model flying, and a description of the plane. These will be displayed together."""
-def search_aircraft_in_api(): # This is to search for the plane in the api
+def search_aircraft_in_api():
     search = input('Enter plane model to search:')
     image_url = planeImage.get_image_link(search)
     print(image_url)
+
+    bookmark_menu = create_bookmark_menu()
+
+    while True:
+        print(bookmark_menu)
+        choice = input('Enter action here: ')
+        action = bookmark_menu.get_choice(choice)
+        if action is go_back:
+            action()
+            break
+        action()
 
 
 def search_bookmarked_plane(): # this searches in the user db
@@ -62,6 +81,7 @@ def search_bookmarked_plane(): # this searches in the user db
 
 
 def add_plane_to_bookmarks(): # This is to add a plane to the user db
+    print('This called the bookmark function.')
     pass
 
 
@@ -69,6 +89,10 @@ def display_bookmarked_planes(): # This displays all the planes in the user db
     planes = db_manager.show_bookmarked_planes()
     for plane in planes:
         print(plane)
+
+
+def go_back():
+    print('\nOk, sending you back...\n')
 
 
 # Developer test function just to create data to manipulate in the database. Should be removed once we can search for
