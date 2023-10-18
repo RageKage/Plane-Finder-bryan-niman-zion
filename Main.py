@@ -64,7 +64,7 @@ def search_aircraft_in_api():
     # Creates a menu with the option to bookmark a plane.
     bookmark_menu = create_bookmark_menu()
 
-    # Loop pulled from Main(). Creates a mini menu
+    # Loop pulled from Main(). Shows the bookmark_menu to choose options from.
     while True:
         print(bookmark_menu)
         choice = input('Enter action here: ')
@@ -72,6 +72,7 @@ def search_aircraft_in_api():
         if action is go_back:
             action()
             break
+        # Since there is only two actions, the second choice can have parameters already filled out.
         action(search, description, image_url)
 
 
@@ -84,8 +85,9 @@ def search_bookmarked_plane(): # this searches in the user db
         print(plane)
 
 
-def add_plane_to_bookmarks(name, description, url): # This is to add a plane to the user db
-    print('This called the bookmark function.')
+"""This adds the recently searched plane to the 'bookmarked_planes' database. It requires a name, description, and image
+   link of the plane to work."""
+def add_plane_to_bookmarks(name, description, url):
     new_plane = BookmarkedPlane(name=name, description=description, image_url=url)
     new_plane.save()
 
