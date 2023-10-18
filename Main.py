@@ -57,7 +57,9 @@ def delete_bookmarked_plane():  # This is to delete a plane from the user db
 def search_aircraft_in_api():
     search = input('Enter plane model to search:')
     image_url = planeImage.get_image_link(search)
-    print(image_url)
+    print(image_url)  # This line should be removed/altered once all APIs are functional.
+
+    description = 'test description'  # Stand-in for the wiki API.
 
     # Creates a menu with the option to bookmark a plane.
     bookmark_menu = create_bookmark_menu()
@@ -70,7 +72,7 @@ def search_aircraft_in_api():
         if action is go_back:
             action()
             break
-        action()
+        action(search, description, image_url)
 
 
 def search_bookmarked_plane(): # this searches in the user db
@@ -82,9 +84,10 @@ def search_bookmarked_plane(): # this searches in the user db
         print(plane)
 
 
-def add_plane_to_bookmarks(): # This is to add a plane to the user db
+def add_plane_to_bookmarks(name, description, url): # This is to add a plane to the user db
     print('This called the bookmark function.')
-    pass
+    new_plane = BookmarkedPlane(name=name, description=description, image_url=url)
+    new_plane.save()
 
 
 def display_bookmarked_planes(): # This displays all the planes in the user db
@@ -101,9 +104,9 @@ def go_back():  # Very short function since the menu object requires a function 
 # Developer test function just to create data to manipulate in the database. Should be removed once we can search for
 # actual plane data.
 def create_sample_planes():
-    boeing = BookmarkedPlane(name='Boeing 737', description='a plane created by Boeing.')
+    boeing = BookmarkedPlane(name='Boeing 737', description='a plane created by Boeing.', image_url='fakelink.com')
     boeing.save()
-    airbus = BookmarkedPlane(name='Airbus A-321neo', description='a plane created by Airbus.')
+    airbus = BookmarkedPlane(name='Airbus A-321neo', description='a plane created by Airbus.', image_url='fakelink2.com')
     airbus.save()
 
 

@@ -12,12 +12,13 @@ aircraftDataDB = SqliteDatabase(aircraft_data_db_path)  # This is the database f
 class BookmarkedPlane(Model):  # This is the model for the user's planes.
     name = CharField()
     description = CharField()
+    image_url = CharField()
 
     class Meta:
         database = bookmarkedPlaneDB
 
     def __str__(self):
-        return f'{self.name} is {self.description}'
+        return f'{self.name} is {self.description}. Here\'s an image of this plane: {self.image_url}'
 
 
 class AircraftData(Model):  # This is the model for the aircraft data.
