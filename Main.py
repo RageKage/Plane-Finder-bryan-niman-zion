@@ -1,6 +1,7 @@
 import databaseManager
 from databaseManager import *
 from menu import Menu
+import planeImage
 
 def Main():
         
@@ -32,7 +33,16 @@ def create_menu():
 
     return menu
 
-def delete_bookmarked_plane(): # This is to delete a plane from the user db
+
+def create_bookmark_menu():  # Adds 2 options to a menu after each time the user searches for a plane.
+    menu = Menu()
+    menu.add_option('1', 'Bookmark this plane', add_plane_to_bookmarks)
+    menu.add_option('2', 'Go back to main menu', go_back)
+
+    return menu
+
+
+def delete_bookmarked_plane():  # This is to delete a plane from the user db
     planes = db_manager.show_bookmarked_planes()
     for plane in planes:
         print(plane)
@@ -40,9 +50,30 @@ def delete_bookmarked_plane(): # This is to delete a plane from the user db
     db_manager.delete_plane_by_model_or_dbID(delete)
     pass
 
-def search_aircraft_in_api(): # This is to search for the plane in the api
+
+"""This function is called when a user wants to find out more information about a specific plane model. So far the user
+   can get a url to an image of the plane they searched for by calling the Flickr API. TBA calls that will also get the
+   current number of that model flying, and a description of the plane. These will be displayed together."""
+def search_aircraft_in_api():
     search = input('Enter plane model to search:')
-    pass
+    image_url = planeImage.get_image_link(search)
+    print(image_url)  # This line should be removed/altered once all APIs are functional.
+
+    description = 'test description'  # Stand-in for the wiki API.
+
+    # Creates a menu with the option to bookmark a plane.
+    bookmark_menu = create_bookmark_menu()
+
+    # Loop pulled from Main(). Shows the bookmark_menu to choose options from.
+    while True:
+        print(bookmark_menu)
+        choice = input('Enter action here: ')
+        action = bookmark_menu.get_choice(choice)
+        if action is go_back:
+            action()
+            break
+        # Since there is only two actions, the second choice can have parameters already filled out.
+        action(search, description, image_url)
 
 
 def search_bookmarked_plane(): # this searches in the user db
@@ -53,8 +84,12 @@ def search_bookmarked_plane(): # this searches in the user db
     else:
         print(plane)
 
-def add_plane_to_bookmarks(): # This is to add a plane to the user db
-    pass
+
+"""This adds the recently searched plane to the 'bookmarked_planes' database. It requires a name, description, and image
+   link of the plane to work."""
+def add_plane_to_bookmarks(name, description, url):
+    new_plane = BookmarkedPlane(name=name, description=description, image_url=url)
+    new_plane.save()
 
 
 def display_bookmarked_planes(): # This displays all the planes in the user db
@@ -63,12 +98,17 @@ def display_bookmarked_planes(): # This displays all the planes in the user db
         print(plane)
 
 
+def go_back():  # Very short function since the menu object requires a function parameter. This is just to give the user
+                # a response before pulling up the main menu.
+    print('\nOk, sending you back...\n')
+
+
 # Developer test function just to create data to manipulate in the database. Should be removed once we can search for
 # actual plane data.
 def create_sample_planes():
-    boeing = BookmarkedPlane(name='Boeing 737', description='a plane created by Boeing.')
+    boeing = BookmarkedPlane(name='Boeing 737', description='a plane created by Boeing.', image_url='fakelink.com')
     boeing.save()
-    airbus = BookmarkedPlane(name='Airbus A-321neo', description='a plane created by Airbus.')
+    airbus = BookmarkedPlane(name='Airbus A-321neo', description='a plane created by Airbus.', image_url='fakelink2.com')
     airbus.save()
 
 
