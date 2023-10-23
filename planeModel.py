@@ -1,18 +1,41 @@
-# fetch from the db and return the plane models and their icao codes
+import requests
 
+class FlightInfo:
+    def __init__(self, api_key, icao_code): 
+        self.api_key = api_key
+        self.icao_code = icao_code
+        self.flight_info_dict = {} # empty dictionary to store flight info
+         
+    def fetch_data_from_api(self): # fetch flight info from the api and return it only if it's 200 OK
+        url = f"https://airlabs.co/api/v9/flights?api_key={self.api_key}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()['response']
+        else:
+            return []
 
-# create a plane model class
+        
+    def process_flight_data(self, data):
+        plane_count = 0  # counter for the number of planes processed, their are just way too many planes to process
+        for item in data: 
+            aircraft_icao = item.get('aircraft_icao', '') # this will get the aircraft icao code
+            dep_icao = item.get('dep_icao', '')
+            arr_icao = item.get('arr_icao', '')
 
+            if aircraft_icao == self.icao_code:
+                unique_key = plane_count + 1  # This is the unique key for the dictionary
+                self.flight_info_dict[unique_key] = {
+                    "aircraft_icao": aircraft_icao,
+                    'dep_icao': dep_icao,
+                    'arr_icao': arr_icao,
+                }
+                plane_count += 1  # Increment the plane count
+                if plane_count >= 5: # this will only process 5 planes
+                    break 
+        
+    def fetch_flight_info(self):
+        data = self.fetch_data_from_api()
+        self.process_flight_data(data)
 
-# setup the api calls to https://airlabs.co/api/v9/flights?api_key=28d1a875-c09d-40bb-9725-9472fd0490fc 
-
-
-
-# make a function that takes in a plane model and returns the icao code
-
-
-# take the icao code and make a call to the air labs api and return the data on current flights
-
-
-# create a function that will take the data and filter out so that it will only return the flights that are in the air by their icao code
-
+    def get_filtered_flight_info(self): 
+        return self.flight_info_dict # Get the filtered flight info dictionary and return it

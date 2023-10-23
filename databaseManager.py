@@ -30,7 +30,8 @@ class AircraftData(Model):  # This is the model for the aircraft data.
         database = aircraftDataDB
 
     def __str__(self):
-        return f'{self.model} and its icao code is {self.icao_code}'
+        return f'{self.model} and its icao code is {self.icao}'
+
 
 
 class DatabaseManager:  # This is the class that manages the database operations
@@ -100,3 +101,15 @@ class DatabaseManager:  # This is the class that manages the database operations
             return str(plane) # This returns the plane as a string
         else:
             print(f'No plane found with name {plane_name}.')
+
+    def search_aircraft_by_model(self, model):
+        aircrafts = AircraftData.select().where(AircraftData.model.contains(model))
+        return list(aircrafts)
+
+    def search_aircraft_by_icao(self, icao):
+        aircraft = AircraftData.get_or_none(AircraftData.icao == icao)
+        if aircraft:
+            return aircraft
+        else:
+            print(f'No plane found with icao {icao}.')
+            return None
