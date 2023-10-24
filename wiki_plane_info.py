@@ -31,7 +31,7 @@ class PlaneInfo:
         clean_text = self.clean_extract_text(page_info)
         return clean_text
     
-    #print(clean_extract_text(extract_page_info(make_wikipedia_request('Boeing 737'))))
+
 
     
 
