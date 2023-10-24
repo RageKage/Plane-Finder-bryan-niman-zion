@@ -1,5 +1,8 @@
 import databaseManager
 from databaseManager import *
+
+from wiki_plane_info import *
+
 from menu import Menu
 import planeImage
 
@@ -59,7 +62,7 @@ def search_aircraft_in_api():
     image_url = planeImage.get_image_link(search)
     print(image_url)  # This line should be removed/altered once all APIs are functional.
 
-    description = 'test description'  # Stand-in for the wiki API.
+    description = PlaneInfo.clean_extract_text(PlaneInfo.extract_page_info(PlaneInfo.make_wikipedia_request(search.model)))
 
     # Creates a menu with the option to bookmark a plane.
     bookmark_menu = create_bookmark_menu()
