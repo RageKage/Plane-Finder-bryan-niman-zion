@@ -152,7 +152,7 @@ def filter_through_aircrafts(aircrafts):
 
     for aircraft in aircrafts:
         if aircraft.icao == choice:
-            return aircraft.icao  # this will return the aircraft that the user chose
+            return aircraft  # this will return the aircraft that the user chose
 
     return None
 
