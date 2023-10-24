@@ -110,7 +110,7 @@ def search_aircraft_in_api():
 
     print(search)
 
-    image_url = planeImage.get_image_link(search)
+    image_url = planeImage.get_image_link(search.model)
 
     print(image_url)  # This line should be removed/altered once all APIs are functional.
 
@@ -128,7 +128,7 @@ def search_aircraft_in_api():
             action()
             break
         # Since there is only two actions, the second choice can have parameters already filled out.
-        action(search, description, image_url)
+        action(search.model, description, image_url)
 
 
 # this just returns the aircraft model like list of them all
