@@ -1,5 +1,7 @@
 .env
-
-
 env/
 venv/
+database/
+__pycache__/
+
+OneTimeMessage.txt
