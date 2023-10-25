@@ -27,7 +27,7 @@ class TestFlickrAPI(TestCase):
             get_image_link('dfjhkvfsfjsvhsdsgkjh')
 
     """This test checks what happens if an API connection isn't possible because of internet connection issues. The expectation is an error message
-    telling the user to fix their internet connection."""
+    telling the user to fix their internet connection. This test requires you to turn your wifi off manually to function properly."""
     def test_no_internet(self):
         error_message = 'Error: No internet connection. Please fix your connection before using the Flickr API again.'
         self.assertEqual(error_message, get_image_link('B773'))
