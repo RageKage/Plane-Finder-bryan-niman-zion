@@ -1,13 +1,10 @@
-import databaseManager
+import os
 from databaseManager import *
-
 from wiki_plane_info import *
-
 from menu import Menu
 import planeImage
 from airport_cache import fetch_and_cache_airports, flight_info_with_airport_names
-
-
+import ui
 from planeModel import FlightInfo
 
 # env variables
@@ -16,10 +13,8 @@ Aviation_apiKey = os.environ.get('AVIATIONS_API_KEY')
 
 
 def Main():
-
-    # Create a menu here.
+    """This function creates the menu and displays the menu and gets the user input and runs the action."""
     menu = create_menu()
-
     while True:
         print(menu)
         choice = input('Enter action here: ')
@@ -29,100 +24,88 @@ def Main():
         action()
 
 
-# this function creates the menu to be seen by the user.
 def create_menu():
+    """This is the main function that creates the menu and adds the options to the menu."""
     menu = Menu()
     menu.add_option('1', 'DB Plane Search', search_bookmarked_plane)
     menu.add_option('2', 'API Plane Search', search_aircraft_in_api)
     menu.add_option('3', 'Display Bookmarked Planes',
                     display_bookmarked_planes)
-
-    # menu.add_option('4', 'Bookmark a Plane', bookmark_plane) possible option, TBD whether this is worth it.
-
     menu.add_option('4', 'Delete Plane in DB', delete_bookmarked_plane)
     menu.add_option('5', 'Generate Test Data', create_sample_planes)
     menu.add_option('6', 'Exit Program', exit)
-
     return menu
 
 
-# Adds 2 options to a menu after each time the user searches for a plane.
 def create_bookmark_menu():
+    """This function creates the bookmark menu and adds the options to the menu."""
     menu = Menu()
     menu.add_option('1', 'Bookmark this plane', add_plane_to_bookmarks)
     menu.add_option('2', 'Go back to main menu', go_back)
-
     return menu
 
 
-def delete_bookmarked_plane():  # This is to delete a plane from the user db
+def delete_bookmarked_plane():
+    """This function deletes a bookmarked plane from the database."""
     planes = db_manager.show_bookmarked_planes()
     for plane in planes:
         print(plane)
     delete = input('Enter plane model to delete:')
-    db_manager.delete_plane_by_model_or_dbID(delete)
-    pass
-
-
-"""This function is called when a user wants to find out more information about a specific plane model. So far the user
-   can get a url to an image of the plane they searched for by calling the Flickr API. TBA calls that will also get the
-   current number of that model flying, and a description of the plane. These will be displayed together."""
+    db_manager.delete_plane_by_model(delete)
 
 
 def search_aircraft_in_api():
-    # TODO make cure that it isn't case sensitive
-    # TODO maybe create another .py but to just show the user instead of having prints in the main.py
-    # TODO now we have the api working merge the codes so it works as intended
+    """This function searches for an aircraft in the api and displays the information about the aircraft."""
+
     user_input = input('Enter plane model or icao code to search:').strip()
     fetch_and_cache_airports(Airlabs_apiKey)
-
-    # Return if no input is provided
     if not user_input:
         print('Please enter a valid plane model or icao code.')
         return
-
-    # If user input is an ICAO code
-    if len(user_input) <= 4:  # the format of a icao is that it must be less then 4 characters
+    if len(user_input) <= 4:
         aircraft = db_manager.search_aircraft_by_icao(user_input)
         if not aircraft:
             print('Plane not found.')
             return
         else:
             search = aircraft
-
- # this is when they but in something that isn't an icao code like model name
     else:
         models = db_manager.search_aircraft_by_model(user_input)
         if not models:
             print('Plane not found.')
             return
         else:
-            if len(models) == 1:  # if there is only one model then it will just return that model
+            if len(models) == 1:
                 search = models[0]
             else:
-                # if there is more then one model then it will filter through them and return the one they chose
                 search = filter_through_aircrafts(models)
+                if not search:
+                    print('Plane not found.')
+                    return
 
+    "This is where the flight info is fetched "
     flight_info_obj = FlightInfo(Airlabs_apiKey, search.icao)
     flight_info_obj.fetch_flight_info()
-    # this will return a dictionary of the flight info with the icao codes and airport icao codes
     flights = flight_info_obj.get_filtered_flight_info()
 
-    # this will return a list of the current flights with the airport names
+    "This gets current flight info, image, and description"
     current_flights = flight_info_with_airport_names(flights)
-
-    print(search)
-
     image_url = planeImage.get_image_link(search.model)
+    description = PlaneInfo.clean_extract_text(
+        PlaneInfo.extract_page_info(PlaneInfo.make_wikipedia_request(search.model)))
 
-    print(image_url)  # This line should be removed/altered once all APIs are functional.
+    "This displays the information about the aircraft and the current flights"
+    ui.display_aircraft_info(description, search.model)
+    ui.show_current_flights(current_flights)
+    ui.show_image_url(image_url)
 
-    description = PlaneInfo.clean_extract_text(PlaneInfo.extract_page_info(PlaneInfo.make_wikipedia_request(search.model)))
-
-    # Creates a menu with the option to bookmark a plane.
+    "This is where the bookmark menu is created and the options are added to the menu."
     bookmark_menu = create_bookmark_menu()
+    handle_bookmark_menu(bookmark_menu, search, description, image_url)
 
-    # Loop pulled from Main(). Shows the bookmark_menu to choose options from.
+
+def handle_bookmark_menu(bookmark_menu, search, description, image_url):
+    """This function handles the bookmark menu and displays the menu and gets the user input and runs the action."""
     while True:
         print(bookmark_menu)
         choice = input('Enter action here: ')
@@ -130,38 +113,32 @@ def search_aircraft_in_api():
         if action is go_back:
             action()
             break
-        # Since there is only two actions, the second choice can have parameters already filled out.
         action(search.model, description, image_url)
 
 
-# this just returns the aircraft model like list of them all
-
-# this func will search the list of aircrafts and filter out the duplicates that are in the list
 def filter_through_aircrafts(aircrafts):
-    icao_codes = set()  # this is to store the icao codes so we don't have duplicates
-    counter = 0  # this is to count the number of aircrafts
-
+    """This function filters through all the aircraft and displays the aircraft and gets the user input and returns the
+    aircraft that the user chose. Also, this function checks for duplicates and only displays one of each aircraft."""
+    icao_codes = set()
+    counter = 0
     for aircraft in aircrafts:
         if aircraft.icao not in icao_codes:
             counter += 1
             print(f"{counter}. {aircraft.model} - {aircraft.icao}")
             icao_codes.add(aircraft.icao)
-
     choice = input('Enter the ICAO to search: ')
-
-    while choice not in icao_codes:  # this will check to see if the icao code is in the set
+    while choice not in icao_codes:
         print('Enter a valid ICAO code.')
         choice = input('Enter the ICAO to search: ')
-
     for aircraft in aircrafts:
         if aircraft.icao == choice:
-            return aircraft  # this will return the aircraft that the user chose
-
+            return aircraft
     return None
 
 
-def search_bookmarked_plane():  # this searches in the user db
-    search = input('Enter the plane you want to search for (Model or icao): ')
+def search_bookmarked_plane():
+    """This function searches for a bookmarked plane in the database and displays the information about the plane."""
+    search = input('Enter the plane you want to search for by Model Name: ')
     plane = db_manager.search_plane(search)
     if plane is None:
         print('Plane not found.')
@@ -169,30 +146,26 @@ def search_bookmarked_plane():  # this searches in the user db
         print(plane)
 
 
-"""This adds the recently searched plane to the 'bookmarked_planes' database. It requires a name, description, and image
-   link of the plane to work."""
-
-
 def add_plane_to_bookmarks(name, description, url):
+    """This function adds a plane to the database."""
     new_plane = BookmarkedPlane(
         name=name, description=description, image_url=url)
     new_plane.save()
 
 
-def display_bookmarked_planes():  # This displays all the planes in the user db
+def display_bookmarked_planes():
+    """This function displays all the bookmarked planes in the database."""
     planes = db_manager.show_bookmarked_planes()
-    for plane in planes:
-        print(plane)
+    ui.display_bookmarked_planes(planes)
 
 
-def go_back():  # Very short function since the menu object requires a function parameter. This is just to give the user
-    # a response before pulling up the main menu.
+def go_back():
+    """This function sends the user back to the main menu."""
     print('\nOk, sending you back...\n')
 
 
-# Developer test function just to create data to manipulate in the database. Should be removed once we can search for
-# actual plane data.
 def create_sample_planes():
+    """THis function creates sample planes and adds them to the database."""
     boeing = BookmarkedPlane(
         name='Boeing 737', description='a plane created by Boeing.', image_url='fakelink.com')
     boeing.save()
@@ -201,28 +174,16 @@ def create_sample_planes():
     airbus.save()
 
 
-# Runs the program
 if __name__ == '__main__':
+    """This is the main function that runs the program. This creates the db folder and also checks to see if the 
+    OneTimeMessage.txt file exists and if it doesn't then it will fetch all the data from the api and populate the database."""
     api_url = 'http://api.aviationstack.com/v1/airplanes'
-    # This is to get the api key from the environment variables
-
-    # This is to check if the user has already been notified about the wait time for the api store the aircraft data into the db.
     if not os.path.exists('OneTimeMessage.txt'):
-
-        print('')
-        print('')
         print('Fetching all current data and populating it into database. This may take a while.')
         with open('OneTimeMessage.txt', 'w') as file:
-            # This will create a file to indicate that the user has already been notified about the wait time for the api to store the aircraft data into the db.
             file.write('True')
-    print('')
-    print('')
-    # This is to create the database manager object, with the api url and the access key.
     db_manager = DatabaseManager(api_url, Aviation_apiKey)
-
-    db_manager.setup_databases()  # This will set up your databases
-
-    # This is to check if the aircraft data is already in the db. If it is then it won't fetch it again.
+    db_manager.setup_databases()
     if not AircraftData.select().exists():
         db_manager.fetch_and_store_airplane_data()
     Main()
