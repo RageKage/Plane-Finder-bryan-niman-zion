@@ -117,7 +117,8 @@ def handle_bookmark_menu(bookmark_menu, search, description, image_url):
 
 
 def filter_through_aircrafts(aircrafts):
-    """This function filters through the aircrafts and displays the aircrafts and gets the user input and returns the aircraft that the user chose. Also this function checks for duplicates and only displays one of each aircraft."""
+    """This function filters through all the aircraft and displays the aircraft and gets the user input and returns the
+    aircraft that the user chose. Also, this function checks for duplicates and only displays one of each aircraft."""
     icao_codes = set()
     counter = 0
     for aircraft in aircrafts:
@@ -174,7 +175,8 @@ def create_sample_planes():
 
 
 if __name__ == '__main__':
-    """This is the main function that runs the program. This creates the db folder and also checks to see if the OneTimeMessage.txt file exists and if it doesn't then it will fetch all the data from the api and populate the database."""
+    """This is the main function that runs the program. This creates the db folder and also checks to see if the 
+    OneTimeMessage.txt file exists and if it doesn't then it will fetch all the data from the api and populate the database."""
     api_url = 'http://api.aviationstack.com/v1/airplanes'
     if not os.path.exists('OneTimeMessage.txt'):
         print('Fetching all current data and populating it into database. This may take a while.')
