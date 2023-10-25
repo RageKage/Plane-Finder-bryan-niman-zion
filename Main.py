@@ -19,9 +19,13 @@ def Main():
         print(menu)
         choice = input('Enter action here: ')
         action = menu.get_choice(choice)
-        if action is None:
+        if action == 'invalid':
+            print('That was an invalid input. Please try again from the given options.')
+        elif action == exit:
+            print('Thanks for using Plane Finder!')
             exit()
-        action()
+        else:
+            action()
 
 
 def create_menu():
@@ -113,7 +117,10 @@ def handle_bookmark_menu(bookmark_menu, search, description, image_url):
         if action is go_back:
             action()
             break
-        action(search.model, description, image_url)
+        elif action == 'invalid':
+            print('That isn\'t a valid input please try again.')
+        else:
+            action(search.model, description, image_url)
 
 
 def filter_through_aircrafts(aircrafts):
