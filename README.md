@@ -4,6 +4,39 @@ By: Niman, Zion, and Bryan
 
 The Plane Finder App makes use of 3 different APIs to bring results to the user, the Flickr API, the Wikipedia API, and AirLabs API.
 
+
+
+
+
+## Setup
+
+### Create and Activate Virtual Environment
+
+python3 -m venv env
+source env/bin/activate
+
+
+### Install Required Packages
+install -r requirements.txt
+
+
+### Flickr Account Setup
+- create a flickr account
+
+### Environment Variables
+Add these keys to your environment variables with their api keys:
+1. AVIATIONS_API_KEY
+2. AIRLABS_API_KEY
+3. FLICKR_KEY
+4. FLICKR_SECRET
+
+### API sites
+1. https://aviationstack.com/documentation
+2. https://airlabs.co/
+3. https://www.flickr.com/services/api/
+
+
+
 The user enters the desired airframe (model/type of plane) and the python file converts the string into an ICAO number, 
 which then uses a call to the AirLabs API to get a count of the number of planes with that ICAO number currently aloft. 
 The app also makes use of a call to the Flickr API to return a photo of an example of that airframe, 
