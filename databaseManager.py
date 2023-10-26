@@ -58,7 +58,7 @@ class DatabaseManager:
         """This function fetches the data from the api and stores it into the database."""
         try:
             response = requests.get(
-                f'{self.api_url}?access_key={self.access_key}&limit=10000')
+                f'{self.api_url}?access_key={self.access_key}&limit=100000')
             if response.status_code == 200:
                 airplane_data = response.json()['data']
                 self.store_airplane_data(airplane_data)

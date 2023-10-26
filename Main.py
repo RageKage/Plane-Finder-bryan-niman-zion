@@ -185,5 +185,5 @@ if __name__ == '__main__':
     db_manager = DatabaseManager(api_url, Aviation_apiKey)
     db_manager.setup_databases()
     if not AircraftData.select().exists():
-        db_manager.fetch_and_store_airplane_data()
+        db_manager.fetch_airplane_data()
     Main()
