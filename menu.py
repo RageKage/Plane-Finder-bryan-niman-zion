@@ -18,7 +18,16 @@ class Menu:
 
     # Returns what function should be invoked if one is found. If nothing is found, NoneType is returned.
     def get_choice(self, choice):
-        return self.functions.get(choice)
+        if self.validate_choice(choice):
+            return self.functions.get(choice)
+        else:
+            return 'invalid'
+
+    def validate_choice(self, choice):
+        if choice in self.functions.keys():
+            return True
+        else:
+            return False
 
     # Creates a printable menu with each option on their own line.
     def __str__(self):
